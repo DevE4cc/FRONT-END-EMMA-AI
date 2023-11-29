@@ -4,6 +4,7 @@ import annyang from "annyang";
 const VoiceRecognitionComponent = ({
   onTranscript,
   handleCancel,
+  isRecordingApp,
   setIsRecordingApp,
   isPlaying,
   stopPlayback,
@@ -59,25 +60,18 @@ const VoiceRecognitionComponent = ({
     setIsRecordingApp(isRecording);
   }, [isRecording]);
 
-  return (
-    <div className="z-[100]">
-      {
-        isPlaying ? (
-          <div className="fixed bottom-[7rem] left-[50%] translate-x-[-50%]">
-            <div className="p-4 bg-red-500 text-white rounded cursor-pointer" onClick={() => stopPlayback()}>
-              <p className="text-center">Parar audio <i class="fa-solid fa-circle-stop"></i></p>
-            </div>
-          </div>
-        ) : null
-      }
-      <button
-        className="bg-blue-500 text-white p-4 font-bold rounded fixed bottom-[2rem] left-[50%] translate-x-[-50%]"
-        onClick={toggleRecording}
-      >
-        {isRecording ? "Detener Grabación" : "Iniciar Grabación"}
-      </button>
-    </div>
-  );
+  useEffect(() => {
+    if (!isRecordingApp) {
+      annyang.abort();
+      setIsRecording(false);
+    } else {
+      annyang.start({ autoRestart: true, continuous: true });
+      setIsRecording(true);
+    }
+  }
+  , [isRecordingApp]);
+
+  return null;
 };
 
 export default VoiceRecognitionComponent;

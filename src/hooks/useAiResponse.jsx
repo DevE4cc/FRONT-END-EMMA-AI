@@ -3,6 +3,7 @@ import axios from "axios";
 
 const useAiResponse = (transcript) => {
   const [aiResponse, setAiResponse] = useState("");
+  const [aiArrayResponse, setArrayAiResponse] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
   const isRequestPending = useRef(false);
@@ -36,8 +37,8 @@ const useAiResponse = (transcript) => {
           signal: abortController.current.signal,
         })
         .then((res) => {
-          console.log("res", res);
           setAiResponse(res.data);
+          setArrayAiResponse(processText(res.data));
           setIsLoading(false);
           isRequestPending.current = false;
         })
@@ -63,7 +64,23 @@ const useAiResponse = (transcript) => {
     }
   };
 
-  return { aiResponse, isLoading, error, cancelRequest };
+  const processText = (text) => {
+    // Regex para identificar párrafos y listas en Markdown.
+    const regex = /(\n- .+)|(\n\d+\. .+)|((?:\r?\n|\r).+?)(?=\n\n|\n- |\n\d+\. |$)/gs;
+    const matches = text.match(regex) || [];
+    const processedText = matches.map(match => match.trim());
+  
+    return processedText;
+  };
+
+  return {
+    aiResponse,
+    isLoading,
+    error,
+    cancelRequest,
+    threadId,
+    aiArrayResponse,
+  };
 };
 
 export default useAiResponse;
