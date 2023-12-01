@@ -23,7 +23,9 @@ const VoiceRecognitionComponent = ({
     if (annyang) {
       // Configura el idioma a español
       annyang.setLanguage(
-        "es-SV,es-MX, en-US,es-CO, es-VE, es-AR,es-CL,es-GT,es-NI, es-HN"
+        // "es-SV,es-MX, en-US,es-CO, es-VE, es-AR,es-CL,es-GT,es-NI, es-HN"
+        // "en-US"
+        "en-US,es-SV"
       );
 
       // Añade los comandos a annyang
