@@ -14,7 +14,7 @@ import ScaleLoader from "react-spinners/ScaleLoader";
 import GridLoader from "react-spinners/GridLoader";
 import PacmanLoader from "react-spinners/PacmanLoader";
 
-export const EmmaConvertations = () => {
+export const EmmaConversation = () => {
   const [isInitialized, setIsInitialized] = useState(false);
   const [transcript, setTranscript] = useState("");
   const resetTranscript = () => setTranscript(""); // Función para resetear el transcript

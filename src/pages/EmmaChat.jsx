@@ -1,158 +1,102 @@
 import React, { useEffect, useState } from "react";
 
-// components
-import VoiceRecognitionComponent from "../components/VoiceRecognitionComponent/VoiceRecognitionComponent";
-import TypeWriter from "../components/TypeWriter/TypeWriter";
-
 // hooks
 import useAiResponse from "../hooks/useAiResponse";
 import useOpenAITTS from "../hooks/useOpenAITTS";
 
 // spinners
-import PulseLoader from "react-spinners/PulseLoader";
+import SyncLoader from "react-spinners/SyncLoader";
 import ScaleLoader from "react-spinners/ScaleLoader";
 import GridLoader from "react-spinners/GridLoader";
 import PacmanLoader from "react-spinners/PacmanLoader";
 
 // css
 import "./EmmaChat.css";
+import { ChatMessaje } from "../components/ChatMessage/ChatMessaje";
 
 export const EmmaChat = () => {
-  const [isInitialized, setIsInitialized] = useState(false);
   const [transcript, setTranscript] = useState("");
   const resetTranscript = () => setTranscript(""); // Función para resetear el transcript
-  const [convertations, setConvertations] = useState([]); // Lista de convertaciones
-
-  const processText = (text) => {
-    const regex = /(\n- .+)|([^.!?]+[.!?])/g; // Regex para identificar listas y oraciones.
-    const matches = text.match(regex) || [];
-    const processedText = [];
-
-    let currentText = "";
-
-    matches.forEach((match) => {
-      if (match.trim().startsWith("-")) {
-        if (currentText.split(" ").length >= 10) {
-          processedText.push(currentText.trim());
-          currentText = "";
-        }
-        processedText.push(match.trim());
-      } else {
-        const wordCount =
-          currentText.split(" ").length + match.split(" ").length;
-        if (wordCount >= 10) {
-          processedText.push(currentText.trim() + " " + match.trim());
-          currentText = "";
-        } else {
-          currentText += " " + match;
-        }
-      }
-    });
-
-    if (currentText.trim()) {
-      if (processedText.length > 0) {
-        processedText[processedText.length - 1] += " " + currentText.trim();
-      } else {
-        processedText.push(currentText.trim());
-      }
-    }
-    return processedText;
-  };
+  const [conversations, setConversations] = useState([]); // Lista de convertaciones
+  const [loadingEmma, setLoadingEmma] = useState(false); // Estado de carga de Emma
 
   const { aiResponse, isLoading, error, cancelRequest, threadId } =
     useAiResponse(transcript, resetTranscript);
 
-  const [isRecording, setIsRecording] = useState(false);
   // Utiliza el hook useElevenLabs
   const { stopPlayback, onResult, isPlaying } = useOpenAITTS(aiResponse);
 
-  const handleTranscript = (newTranscript) => {
-    resetTranscript();
-    setTranscript((prevTranscript) => newTranscript);
-  };
-
-  const handleCancel = () => {
-    cancelRequest();
-    stopPlayback(); // Detiene la reproducción del audio
-    resetTranscript(); // Reinicia el transcript
-  };
-
-  const handleToggleRecording = () => {
-    setIsInitialized(true);
-    setIsRecording(!isRecording);
-  };
-
-  useEffect(() => {
-    if (!isInitialized) return; // No ejecutar hasta que isInitialized sea true
-
-    if (isPlaying) {
-      setIsRecording(false);
-    } else {
-      setIsRecording(true);
-    }
-  }, [isPlaying, isInitialized]);
-
-  const getPrompUser = () => {
+  const sentUserPromp = () => {
     // get user input in textarea
     const inputUser = document.getElementById("input-user");
 
-    // 
-  }
+    // get text from textarea
+    const textUser = inputUser.value;
+
+    // clear textarea
+    inputUser.value = "";
+
+    // crear objeto de conversación
+    const conversation = {
+      id: conversations.length + 1,
+      text: textUser,
+      isEmma: false,
+    };
+
+    // agregar conversación a la lista
+    setConversations([...conversations, conversation]);
+
+    // enviar texto a AI
+    setTranscript(textUser);
+
+    // set loading
+    setLoadingEmma(true);
+  };
+
+  useEffect(() => {
+    if (aiResponse) {
+      const newConversations = [
+        {
+          id: conversations.length + 1,
+          text: aiResponse,
+          isEmma: true,
+        },
+      ];
+      setConversations([...conversations, ...newConversations]);
+    }
+  }, [aiResponse]);
 
   return (
-    <div className="App h-full w-full">
-      <VoiceRecognitionComponent
-        onTranscript={handleTranscript}
-        handleCancel={handleCancel}
-        isRecordingApp={isRecording}
-        setIsRecordingApp={setIsRecording}
-        isPlaying={isPlaying}
-        stopPlayback={stopPlayback}
-      />
-      <div className="p-4">
-        <p className="p-4 pt-6 block relative mx-auto bg-slate-700 text-white rounded-xl text-sm min-h-[4rem] min-w-[80%]">
-          <span className="absolute top-[0.4rem] left-[1rem] text-xs text-gray-300">
-            Transcript:
-          </span>
-          <span className="text-white">{transcript}</span>
-        </p>
-        <p className="p-4 pt-6 mt-4 block relative mx-auto bg-slate-700 text-white rounded-xl text-sm min-h-[4rem] min-w-[80%] max-h-[55vh] overflow-auto">
-          <span className="absolute top-[0.4rem] left-[1rem] text-xs text-gray-300">
-            Respuesta de Emma:
-          </span>
-          <span className="text-white markdown">
-            <TypeWriter text={aiResponse} delay={200} />
-          </span>
-        </p>
-        <div className="bottom-[10rem] fixed left-[50%] translate-x-[-50%]">
-          {isRecording}
-          {onResult || isLoading ? (
-            <PulseLoader color="#ffffff" />
-          ) : isPlaying ? (
-            <ScaleLoader color="#ffffff" height={80} />
-          ) : isRecording ? (
-            <GridLoader color="#ffffff" />
-          ) : null}
-        </div>
-      </div>
+    <div className="flex flex-col h-full w-full p-4">
+      {/* Vista de chats */}
 
-      {isPlaying ? (
-        <div className="fixed bottom-[3.6rem] left-[25%] sm:left-[35%] translate-x-[-50%]">
+      <div className="w-[100%] h-full bg-slate-900 mb-5 rounded-2xl p-4 overflow-auto">
+        {conversations.map((conversation) => (
+          <ChatMessaje
+            key={conversation.id}
+            message={conversation.text}
+            isEmma={conversation.isEmma}
+          />
+        ))}
+
+        {isLoading && (
           <div
-            className="border-[3px] text-white w-[2.5rem] aspect-square flex justify-center items-center text-sm rounded-full cursor-pointer"
-            onClick={() => stopPlayback()}
+            className={`p-4 w-[90%] pt-2 rounded-xl text-white mb-2 bg-slate-700`}
           >
-            <p className="text-center">
-              <i className="fa-solid fa-stop"></i>
-            </p>
-            <span className="text-slate-400 text-xs absolute w-[4rem] text-center bottom-[-2.1rem] left-[50%] translate-x-[-50%]">
-              Stop Emma
-            </span>
+            <div className="chat-message">
+              <span className="font-bold text-xs ">Emma: </span>
+              <br />
+              <SyncLoader
+                color="#ffffff"
+                cssOverride={{}}
+                margin={3}
+                size={6}
+              />
+            </div>
           </div>
-        </div>
-      ) : null}
-
-      <div className="z-[100] fixed bottom-[1.5rem] left-[50%] translate-x-[-50%] w-[90%]">
+        )}
+      </div>
+      <div className="z-[100] w-[100%]">
         {threadId != "" ? (
           <div className="relative">
             <textarea
@@ -161,9 +105,21 @@ export const EmmaChat = () => {
               id="input-user"
               className="border-2 border-white bg-black text-white rounded-2xl h-[4rem] w-full p-2 pr-14 ring-white focus-visible:ring-2 focus-visible:ring-white focus-visible:outline-none"
             ></textarea>
-            <button className="text-white bg-black text-xs rounded-xl border-2 border-white h-8 aspect-square absolute bottom-[50%rem] translate-y-[50%] right-[3%]">
-              <i className="fa-solid fa-paper-plane-top"></i>
-            </button>
+            {isPlaying ? (
+              <button
+                onClick={() => stopPlayback()}
+                className="text-white bg-black text-xs rounded-xl border-2 border-white h-8 aspect-square absolute bottom-[50%rem] translate-y-[50%] right-[3%]"
+              >
+                <i className="fa-solid fa-stop"></i>
+              </button>
+            ) : (
+              <button
+                onClick={() => sentUserPromp()}
+                className="text-white bg-black text-xs rounded-xl border-2 border-white h-8 aspect-square absolute bottom-[50%rem] translate-y-[50%] right-[3%]"
+              >
+                <i className="fa-solid fa-paper-plane-top"></i>
+              </button>
+            )}
           </div>
         ) : (
           <div className="fixed bottom-[2rem] left-[50%] translate-x-[-50%] flex flex-col justify-center">
