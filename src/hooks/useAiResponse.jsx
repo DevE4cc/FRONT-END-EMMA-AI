@@ -13,7 +13,9 @@ const useAiResponse = (transcript) => {
   useEffect(() => {
     // get thread id
     axios
-      .get(import.meta.env.VITE_API_URL2 + "thread")
+      .post(import.meta.env.VITE_API_URL2 + "thread", {
+        userStudent: JSON.parse(localStorage.getItem("userData")),
+      })
       .then((res) => {
         setThreadId(res.data.id);
       })
@@ -66,10 +68,11 @@ const useAiResponse = (transcript) => {
 
   const processText = (text) => {
     // Regex para identificar párrafos y listas en Markdown.
-    const regex = /(\n- .+)|(\n\d+\. .+)|((?:\r?\n|\r).+?)(?=\n\n|\n- |\n\d+\. |$)/gs;
+    const regex =
+      /(\n- .+)|(\n\d+\. .+)|((?:\r?\n|\r).+?)(?=\n\n|\n- |\n\d+\. |$)/gs;
     const matches = text.match(regex) || [];
-    const processedText = matches.map(match => match.trim());
-  
+    const processedText = matches.map((match) => match.trim());
+
     return processedText;
   };
 

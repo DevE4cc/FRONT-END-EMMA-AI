@@ -4,7 +4,7 @@ function App() {
   return (
     <>
       <AppRouter />
-      <span className="absolute text-blue-500 text-xs bottom-3 left-[50%] translate-x-[-50%]">Made with ❤ by E4CC</span>
+      <span className="absolute text-white text-xs bottom-3 left-[50%] translate-x-[-50%]">Made with ❤ by E4CC</span>
     </>
   );
 }
