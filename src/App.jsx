@@ -1,7 +1,12 @@
 import React from "react";
-import { AppRouter } from './AppRouter'
+import { AppRouter } from "./AppRouter";
 function App() {
-  return <AppRouter />
+  return (
+    <>
+      <AppRouter />
+      <span className="absolute text-white text-xs bottom-4 left-[50%] translate-x-[-50%]">Made with ❤ by E4CC</span>
+    </>
+  );
 }
 
 export default App;

@@ -8,6 +8,7 @@ const VoiceRecognitionComponent = ({
   setIsRecordingApp,
   isPlaying,
   stopPlayback,
+  setStatusAnnyang,
 }) => {
   const [isRecording, setIsRecording] = useState(false);
   // Estado para almacenar el transcript
@@ -23,9 +24,9 @@ const VoiceRecognitionComponent = ({
     if (annyang) {
       // Configura el idioma a español
       annyang.setLanguage(
-        // "es-SV,es-MX, en-US,es-CO, es-VE, es-AR,es-CL,es-GT,es-NI, es-HN"
+        "es-SV,es-MX, en-US,es-CO, es-VE, es-AR,es-CL,es-GT,es-NI, es-HN"
         // "en-US"
-        "en-US,es-SV"
+        // "en-US,es-SV"
       );
 
       // Añade los comandos a annyang
@@ -37,8 +38,10 @@ const VoiceRecognitionComponent = ({
           setTranscript(allSpeech);
         },
       });
+      setStatusAnnyang(true);
     } else {
       console.error("El navegador no soporta annyang");
+      setStatusAnnyang(false);
     }
 
     return () => {

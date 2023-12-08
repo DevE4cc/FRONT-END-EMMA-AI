@@ -24,7 +24,8 @@ export const EmmaChat = () => {
     useAiResponse(transcript, resetTranscript);
 
   // Utiliza el hook useElevenLabs
-  const { stopPlayback, onResult, isPlaying } = useOpenAITTS(aiResponse);
+  const { stopPlayback, onResult, isPlaying, audioData } =
+    useOpenAITTS(aiResponse);
 
   const sentUserPromp = () => {
     // get user input in textarea
@@ -66,9 +67,42 @@ export const EmmaChat = () => {
     }
   }, [aiResponse]);
 
+  useEffect(() => {
+    // si el audioData no es null entonces enviar el audio al último mensaje de conversación
+    if (audioData) {
+      const lastConversation = conversations[conversations.length - 1];
+      lastConversation.audioData = audioData;
+      setConversations([...conversations]);
+    }
+  }, [audioData]);
+  
+  const reloadPage = () => {
+    window.location.reload();
+  };
+
+  const returnToHome = () => {
+    window.location.href = "/";
+  };
+
   return (
     <div className="flex flex-col h-full w-full p-4">
-      {/* Vista de chats */}
+      <header className="w-full p-4 flex justify-between">
+        <h1 className="text-white text-xl font-bold">Emma Chat</h1>
+        <div className="buttons flex flex-row space-x-2">
+          <span
+            className="text-white aspect-square h-[2rem] flex justify-center items-center text-xl cursor-pointer"
+            onClick={() => returnToHome()}
+          >
+            <i className="fa-solid fa-left"></i>
+          </span>
+          <span
+            className="text-white aspect-square h-[2rem] flex justify-center items-center text-xl cursor-pointer"
+            onClick={() => reloadPage()}
+          >
+            <i className="fa-solid fa-arrow-rotate-right"></i>
+          </span>
+        </div>
+      </header>
 
       <div className="w-[100%] h-full bg-slate-900 mb-5 rounded-2xl p-4 overflow-auto">
         {conversations.map((conversation) => (
@@ -76,6 +110,7 @@ export const EmmaChat = () => {
             key={conversation.id}
             message={conversation.text}
             isEmma={conversation.isEmma}
+            audioData={conversation.audioData}
           />
         ))}
 
@@ -101,9 +136,8 @@ export const EmmaChat = () => {
           <div className="relative">
             <textarea
               type="text"
-              name=""
               id="input-user"
-              className="border-2 border-white bg-black text-white rounded-2xl h-[4rem] w-full p-2 pr-14 ring-white focus-visible:ring-2 focus-visible:ring-white focus-visible:outline-none"
+              className="border-2 mb-6 border-white bg-black text-white rounded-2xl h-[4rem] w-full p-2 pr-14 ring-white focus-visible:ring-2 focus-visible:ring-white focus-visible:outline-none"
             ></textarea>
             {isPlaying ? (
               <button

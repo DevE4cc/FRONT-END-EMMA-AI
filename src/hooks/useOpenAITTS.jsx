@@ -6,6 +6,7 @@ const useOpenAITTS = (aiResponse) => {
   const audioContext = useRef(new AudioContext());
   const sourceNode = useRef(null);
   const [onResult, setOnResult] = useState(false);
+  const [audioData, setAudioData] = useState(null);
 
   useEffect(() => {
     if (aiResponse) {
@@ -32,6 +33,8 @@ const useOpenAITTS = (aiResponse) => {
     const decodedAudioData = await audioContext.current.decodeAudioData(
       audioBuffer
     );
+    // set audio data
+    setAudioData(decodedAudioData);
 
     if (sourceNode.current) {
       sourceNode.current.disconnect();
@@ -57,7 +60,7 @@ const useOpenAITTS = (aiResponse) => {
     }
   };
 
-  return { isPlaying, stopPlayback, onResult };
+  return { isPlaying, stopPlayback, onResult, audioData };
 };
 
 // Function to convert text to audio using OpenAI's TTS API
