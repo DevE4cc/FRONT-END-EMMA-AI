@@ -1,63 +1,80 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect } from "react";
 import axios from "axios";
 
-const useSession = (username) => {
-    const [isSession, setIsSession] = useState(false);
-    const [userData, setUserData] = useState(null);
-    const [isLoading, setIsLoading] = useState(false);
+const useSession = () => {
+  const [isSession, setIsSession] = useState(false);
+  const [state, setState] = useState([
+    {
+      state: "initial",
+      current: false,
+    },
+    {
+      state: "loading",
+      current: false,
+    },
+    {
+      state: "error",
+      current: false,
+    },
+    {
+      state: "success",
+      current: false,
+    },
+  ]);
 
-    useEffect(() => {
-        const userData = localStorage.getItem("userData");
-        if (userData) {
-            setUserData(JSON.parse(userData));
-            setIsSession(true);
+  const handleState = (state) => {
+    setState((prevState) => {
+      return prevState.map((item) => {
+        if (item.state === state) {
+          return { ...item, current: true };
         }
+        return { ...item, current: false };
+      });
+    });
+  };
 
-        const isSession = localStorage.getItem("isSession");
-        if (isSession) {
-            setIsSession(isSession);
-        }
-    }, []);
+  const login = async (username) => {
+    const api_key = import.meta.env.VITE_E4CC_API_KEY;
+    handleState("loading");
 
-    const login = async (username) => {
-        const api_key = import.meta.env.VITE_E4CC_API_KEY;
-        try {
-            setIsLoading(true);
-            const response = await axios.get(
-                `https://e4cc-dev.com/API_E4CC/index.php/API/Login/${username}?X-API-KEY=${api_key}`
-            ).then((response) => {
-                console.log(response.data[0].Estado);
-                if (response.data[0].Estado == 1) {
-                    setUserData({
-                        userStudent: username,
-                    });
-                    // save user data in local storage
-                    localStorage.setItem("userData", JSON.stringify(username));
-                    setIsSession(true);
-                    // save isSession in local storage
-                    localStorage.setItem("isSession", true);
-                    setIsLoading(false);
-                } else {
-                    setIsLoading(false);
-                    setIsSession(false);
-                }
-            });
+    try {
+      const response = await axios.get(
+        `https://e4cc-dev.com/API_E4CC/index.php/API/Login/${username}?X-API-KEY=${api_key}`
+      );
+      const { Estado } = response.data[0];
 
+      if (Estado === 1) {
+        localStorage.setItem("userData", JSON.stringify({ userStudent: username }));
 
-            // redirect to home
-        } catch (error) {
-            console.error("Error fetching user data:", error);
-            setIsLoading(false);
-        }
-    };
+        handleState("success");
+      } else {
+        handleState("error");
+      }
+    } catch (error) {
+      handleState("error");
+    }
+  };
 
-    const logout = () => {
-        setIsSession(false);
-        setUserData(null);
-        localStorage.removeItem("userData");
-    };
+  const userData = JSON.parse(localStorage.getItem("userData"));
 
-    return { isSession, userData, isLoading, login, logout };
+  useEffect(() => {
+    if (localStorage.getItem("userData")) {
+      setIsSession(true);
+    }
+  }, []);
+
+  const logout = () => {
+    localStorage.removeItem("userData");
+    window.location.reload();
+  };
+
+  return {
+    isSession,
+    userData,
+    login,
+    logout,
+    state,
+  };
 };
 
 export default useSession;

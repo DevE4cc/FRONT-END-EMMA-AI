@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import axios from "axios";
+import useSession from "./useSession";
 
 const useAiResponse = (transcript) => {
   const [aiResponse, setAiResponse] = useState("");
@@ -9,15 +10,16 @@ const useAiResponse = (transcript) => {
   const isRequestPending = useRef(false);
   const abortController = useRef(new AbortController());
   const [threadId, setThreadId] = useState("");
+  const { userData } = useSession();
 
   useEffect(() => {
     // get thread id
     axios
-      .post(import.meta.env.VITE_API_URL2 + "thread", {
-        userStudent: JSON.parse(localStorage.getItem("userData")),
+      .post(import.meta.env.VITE_API_URL + "thread", {
+        userStudent: userData.userStudent,
       })
       .then((res) => {
-        setThreadId(res.data.id);
+        setThreadId(res.data.threadId);
       })
       .catch((err) => {
         console.log(err);
@@ -35,7 +37,7 @@ const useAiResponse = (transcript) => {
       isRequestPending.current = true;
       setIsLoading(true);
       axios
-        .post(import.meta.env.VITE_API_URL2 + "thinking", data, {
+        .post(import.meta.env.VITE_API_URL + "thinking", data, {
           signal: abortController.current.signal,
         })
         .then((res) => {
