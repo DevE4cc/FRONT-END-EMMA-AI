@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import axios from "axios";
+import useSession from "./useSession";
 
 const useAiResponse = (transcript) => {
   const [aiResponse, setAiResponse] = useState("");
@@ -9,13 +10,16 @@ const useAiResponse = (transcript) => {
   const isRequestPending = useRef(false);
   const abortController = useRef(new AbortController());
   const [threadId, setThreadId] = useState("");
+  const { userData } = useSession();
 
   useEffect(() => {
     // get thread id
     axios
-      .get(import.meta.env.VITE_API_URL2 + "thread")
+      .post(import.meta.env.VITE_API_URL + "thread", {
+        userStudent: userData.userStudent,
+      })
       .then((res) => {
-        setThreadId(res.data.id);
+        setThreadId(res.data.threadId);
       })
       .catch((err) => {
         console.log(err);
@@ -33,7 +37,7 @@ const useAiResponse = (transcript) => {
       isRequestPending.current = true;
       setIsLoading(true);
       axios
-        .post(import.meta.env.VITE_API_URL2 + "thinking", data, {
+        .post(import.meta.env.VITE_API_URL + "thinking", data, {
           signal: abortController.current.signal,
         })
         .then((res) => {
@@ -66,10 +70,11 @@ const useAiResponse = (transcript) => {
 
   const processText = (text) => {
     // Regex para identificar párrafos y listas en Markdown.
-    const regex = /(\n- .+)|(\n\d+\. .+)|((?:\r?\n|\r).+?)(?=\n\n|\n- |\n\d+\. |$)/gs;
+    const regex =
+      /(\n- .+)|(\n\d+\. .+)|((?:\r?\n|\r).+?)(?=\n\n|\n- |\n\d+\. |$)/gs;
     const matches = text.match(regex) || [];
-    const processedText = matches.map(match => match.trim());
-  
+    const processedText = matches.map((match) => match.trim());
+
     return processedText;
   };
 

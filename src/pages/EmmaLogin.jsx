@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import { Label, TextInput, Button } from "flowbite-react";
 import axios from "axios";
 import useSession from "../hooks/useSession";
@@ -6,12 +6,50 @@ import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
 export const EmmaLogin = () => {
+  const loading = useRef(null);
   const [username, setUsername] = useState("");
-  const { isSession, userData, isLoading, login, logout } = useSession('');
+  const { userData, isLoading, login, state } = useSession("");
   const handleSubmit = (event) => {
     event.preventDefault();
     login(username);
   };
+
+  useEffect(() => {
+    state.map((item) => {
+      if (item.current) {
+        if (item.state === "loading") {
+          loading.current = toast.loading("Please wait...");
+        } else if (item.state === "error") {
+          toast.update(loading.current, {
+            render: "Error",
+            type: "error",
+            isLoading: false,
+            autoClose: 2000,
+            progress: undefined,
+            draggable: true,
+            closeOnClick: true,
+          });
+        } else if (item.state === "success") {
+          toast.update(loading.current, {
+            render: "Success",
+            type: "success",
+            isLoading: false,
+            autoClose: 2000,
+            progress: undefined,
+            draggable: true,
+            closeOnClick: true,
+            onClose: () => {
+              window.location.reload();
+            },
+          });
+        }
+      }
+    });
+  }, [state]);
+
+  useEffect(() => {
+    console.log(userData);
+  }, []);
 
   return (
     <div className="w-full h-full p-4 relative overflow-hidden">
