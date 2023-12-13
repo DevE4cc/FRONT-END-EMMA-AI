@@ -65,7 +65,8 @@ const useSession = () => {
 
   const logout = () => {
     localStorage.removeItem("userData");
-    window.location.reload();
+    // redirect to login
+    window.location.href = "/";
   };
 
   return {

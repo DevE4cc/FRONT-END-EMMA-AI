@@ -1,4 +1,7 @@
 import React, { useEffect, useState } from "react";
+import { Button, Modal } from "flowbite-react";
+import { HiOutlineExclamationCircle } from "react-icons/hi";
+import useSession from "../hooks/useSession";
 
 // hooks
 import useAiResponse from "../hooks/useAiResponse";
@@ -15,6 +18,8 @@ import "./EmmaChat.css";
 import { ChatMessaje } from "../components/ChatMessage/ChatMessaje";
 
 export const EmmaChat = () => {
+  const [openModal, setOpenModal] = useState(false);
+  const { logout } = useSession();
   const [transcript, setTranscript] = useState("");
   const resetTranscript = () => setTranscript(""); // Función para resetear el transcript
   const [conversations, setConversations] = useState([]); // Lista de convertaciones
@@ -86,7 +91,7 @@ export const EmmaChat = () => {
 
   return (
     <div className="flex flex-col h-full w-full p-4">
-      <header className="w-full p-4 flex justify-between">
+      <header className="w-full p-4 pt-0 flex justify-between">
         <h1 className="text-white text-xl font-bold">Emma Chat</h1>
         <div className="buttons flex flex-row space-x-2">
           <span
@@ -100,6 +105,12 @@ export const EmmaChat = () => {
             onClick={() => reloadPage()}
           >
             <i className="fa-solid fa-arrow-rotate-right"></i>
+          </span>
+          <span
+            className="text-white aspect-square h-[2rem] flex justify-center items-center text-xl cursor-pointer"
+            onClick={() => setOpenModal(true)}
+          >
+            <i className="fa-solid fa-right-from-bracket"></i>
           </span>
         </div>
       </header>
@@ -164,6 +175,30 @@ export const EmmaChat = () => {
           </div>
         )}
       </div>
+      <Modal
+        show={openModal}
+        size="md"
+        onClose={() => setOpenModal(false)}
+        popup
+      >
+        <Modal.Header />
+        <Modal.Body>
+          <div className="text-center">
+            <HiOutlineExclamationCircle className="mx-auto mb-4 h-14 w-14 text-gray-400 dark:text-gray-200" />
+            <h3 className="mb-5 text-lg font-normal text-gray-500 dark:text-gray-400">
+              Are you sure to log out?
+            </h3>
+            <div className="flex justify-center gap-4">
+              <Button color="failure" onClick={() => logout()}>
+                {"Yes, I'm sure"}
+              </Button>
+              <Button color="gray" onClick={() => setOpenModal(false)}>
+                No, cancel
+              </Button>
+            </div>
+          </div>
+        </Modal.Body>
+      </Modal>
     </div>
   );
 };
