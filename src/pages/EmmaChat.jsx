@@ -26,7 +26,7 @@ export const EmmaChat = () => {
   const [loadingEmma, setLoadingEmma] = useState(false); // Estado de carga de Emma
 
   const { aiResponse, isLoading, error, cancelRequest, threadId } =
-    useAiResponse(transcript, resetTranscript);
+    useAiResponse(transcript, "chat");
 
   // Utiliza el hook useElevenLabs
   const { stopPlayback, onResult, isPlaying, audioData } =

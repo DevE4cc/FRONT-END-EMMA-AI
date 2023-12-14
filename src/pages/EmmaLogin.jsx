@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useRef } from "react";
-import { Label, TextInput, Button } from "flowbite-react";
-import axios from "axios";
+import { Label, TextInput, Button, Modal } from "flowbite-react";
+import { HiOutlineExclamationCircle } from "react-icons/hi";
 import useSession from "../hooks/useSession";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
@@ -13,7 +13,7 @@ export const EmmaLogin = () => {
     event.preventDefault();
     login(username);
   };
-
+  const [openModal, setOpenModal] = useState(false);
   useEffect(() => {
     state.map((item) => {
       if (item.current) {
@@ -21,7 +21,9 @@ export const EmmaLogin = () => {
           loading.current = toast.loading("Please wait...");
         } else if (item.state === "error") {
           toast.update(loading.current, {
-            render: () => <div dangerouslySetInnerHTML={{ __html: item.mensaje }} />,
+            render: () => (
+              <div dangerouslySetInnerHTML={{ __html: item.mensaje }} />
+            ),
             type: "error",
             isLoading: false,
             autoClose: 2000,
@@ -31,7 +33,9 @@ export const EmmaLogin = () => {
           });
         } else if (item.state === "success") {
           toast.update(loading.current, {
-            render: () => <div dangerouslySetInnerHTML={{ __html: item.mensaje }} />,
+            render: () => (
+              <div dangerouslySetInnerHTML={{ __html: item.mensaje }} />
+            ),
             type: "success",
             isLoading: false,
             autoClose: 2000,
@@ -75,9 +79,32 @@ export const EmmaLogin = () => {
                 Verificar
               </Button>
             </div>
+            <div
+              onClick={() => setOpenModal(true)}
+              className="text-xs mt-2 text-gray-600 underline text-end cursor-pointer"
+            >
+              No recuerdas tu usuario?
+            </div>
           </form>
         </div>
       </div>
+      <Modal
+        show={openModal}
+        size="md"
+        onClose={() => setOpenModal(false)}
+        popup
+      >
+        <Modal.Header />
+        <Modal.Body>
+          <div className="text-center">
+            <HiOutlineExclamationCircle className="mx-auto mb-4 h-14 w-14 text-gray-400 dark:text-gray-200" />
+            <h3 className="mb-5 text-lg font-normal text-gray-500 dark:text-gray-400">
+              Recuerda que puedes encontrar tu usuario en tu factura, o puedes
+              pedírselo a tu coach.
+            </h3>
+          </div>
+        </Modal.Body>
+      </Modal>
     </div>
   );
 };

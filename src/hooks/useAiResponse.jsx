@@ -2,7 +2,7 @@ import { useState, useEffect, useRef } from "react";
 import axios from "axios";
 import useSession from "./useSession";
 
-const useAiResponse = (transcript) => {
+const useAiResponse = (transcript, platform) => {
   const [aiResponse, setAiResponse] = useState("");
   const [aiArrayResponse, setArrayAiResponse] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
@@ -17,6 +17,7 @@ const useAiResponse = (transcript) => {
     axios
       .post(import.meta.env.VITE_API_URL + "thread", {
         userStudent: userData.userStudent,
+        platform: platform,
       })
       .then((res) => {
         setThreadId(res.data.threadId);
@@ -31,6 +32,7 @@ const useAiResponse = (transcript) => {
       text: transcript,
       threadId: threadId,
       assistantId: import.meta.env.VITE_ASSISTANT_ID,
+      platform: platform,
     };
 
     if (transcript !== "") {

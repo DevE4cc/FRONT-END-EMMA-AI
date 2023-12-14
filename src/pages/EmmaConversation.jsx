@@ -51,7 +51,7 @@ export const EmmaConversation = () => {
   }, [toggleAnnyang]);
 
   const { aiResponse, isLoading, error, cancelRequest, threadId } =
-    useAiResponse(transcript, resetTranscript);
+    useAiResponse(transcript, "voice");
 
   const [isRecording, setIsRecording] = useState(false);
   // Utiliza el hook useElevenLabs
@@ -75,10 +75,6 @@ export const EmmaConversation = () => {
 
   const reloadPage = () => {
     window.location.reload();
-  };
-
-  const returnToHome = () => {
-    window.location.href = "/";
   };
 
   useEffect(() => {
