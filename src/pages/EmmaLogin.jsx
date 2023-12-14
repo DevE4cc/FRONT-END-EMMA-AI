@@ -21,7 +21,7 @@ export const EmmaLogin = () => {
           loading.current = toast.loading("Please wait...");
         } else if (item.state === "error") {
           toast.update(loading.current, {
-            render: "Error",
+            render: () => <div dangerouslySetInnerHTML={{ __html: item.mensaje }} />,
             type: "error",
             isLoading: false,
             autoClose: 2000,
@@ -31,7 +31,7 @@ export const EmmaLogin = () => {
           });
         } else if (item.state === "success") {
           toast.update(loading.current, {
-            render: "Success",
+            render: () => <div dangerouslySetInnerHTML={{ __html: item.mensaje }} />,
             type: "success",
             isLoading: false,
             autoClose: 2000,

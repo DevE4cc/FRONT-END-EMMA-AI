@@ -7,28 +7,32 @@ const useSession = () => {
     {
       state: "initial",
       current: false,
+      message: ""
     },
     {
       state: "loading",
       current: false,
+      message: ""
     },
     {
       state: "error",
       current: false,
+      message: ""
     },
     {
       state: "success",
       current: false,
+      message: ""
     },
   ]);
 
-  const handleState = (state) => {
+  const handleState = (state, mensaje) => {
     setState((prevState) => {
       return prevState.map((item) => {
         if (item.state === state) {
-          return { ...item, current: true };
+          return { ...item, current: true, mensaje: mensaje };
         }
-        return { ...item, current: false };
+        return { ...item, current: false, mensaje: mensaje };
       });
     });
   };
@@ -41,14 +45,16 @@ const useSession = () => {
       const response = await axios.get(
         `https://e4cc-dev.com/API_E4CC/index.php/API/Login/${username}?X-API-KEY=${api_key}`
       );
-      const { Estado } = response.data[0];
+      const { Estado, mensaje } = response.data[0];
 
       if (Estado === 1) {
         localStorage.setItem("userData", JSON.stringify({ userStudent: username }));
 
-        handleState("success");
+        handleState("success", mensaje);
       } else {
-        handleState("error");
+        // message error
+        console.log(mensaje);
+        handleState("error", mensaje);
       }
     } catch (error) {
       handleState("error");
