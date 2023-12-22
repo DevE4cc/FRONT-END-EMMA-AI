@@ -34,7 +34,7 @@ function App() {
             onClick={() => setOpenModal(true)}
             className="absolute text-gray-400 text-xs bottom-4 left-[2rem] cursor-pointer z-10"
           >
-            Terms and Conditions
+            Terms and <span className="block sm:inline"></span> Conditions
           </span>
 
           <Modal
