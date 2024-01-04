@@ -17,7 +17,8 @@ const useAiResponse = (transcript, platform) => {
     axios
       .post(import.meta.env.VITE_API_URL + "thread", {
         userStudent: userData.userStudent,
-        platform: platform,
+        platform: 'Coach Emma',
+        threadType: platform,
       })
       .then((res) => {
         setThreadId(res.data.threadId);
