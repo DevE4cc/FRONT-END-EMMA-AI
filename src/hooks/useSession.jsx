@@ -37,7 +37,7 @@ const useSession = () => {
     });
   };
 
-  const login = async (username) => {
+  const login = async (username, e4work = false) => {
     const api_key = import.meta.env.VITE_E4CC_API_KEY;
     handleState("loading");
 
@@ -48,7 +48,7 @@ const useSession = () => {
       const { Estado, mensaje } = response.data[0];
 
       if (Estado === 1) {
-        localStorage.setItem("userData", JSON.stringify({ userStudent: username }));
+        localStorage.setItem("userData", JSON.stringify({ userStudent: username, e4work }));
 
         handleState("success", mensaje);
       } else {

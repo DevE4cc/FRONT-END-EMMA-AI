@@ -57,12 +57,11 @@ export const EmmaLogin = () => {
     // console.log(userData);
 
     setTimeout(() => {
-      console.log(user);
-      if (user) {
-        setUsername(username);
-        login(username);
+      if (user != undefined) {
+        setUsername(user);
+        login(user, true);
       }
-    }, 2000);
+    }, 300);
   }, []);
 
   return (
