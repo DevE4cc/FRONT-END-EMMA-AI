@@ -4,11 +4,13 @@ import { HiOutlineExclamationCircle } from "react-icons/hi";
 import useSession from "../hooks/useSession";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import { Routes, Route, useParams } from "react-router-dom";
 
 export const EmmaLogin = () => {
   const loading = useRef(null);
   const [username, setUsername] = useState("");
   const { userData, isLoading, login, state } = useSession("");
+  let { user } = useParams();
   const handleSubmit = (event) => {
     event.preventDefault();
     login(username);
@@ -52,7 +54,15 @@ export const EmmaLogin = () => {
   }, [state]);
 
   useEffect(() => {
-    console.log(userData);
+    // console.log(userData);
+
+    setTimeout(() => {
+      console.log(user);
+      if (user) {
+        setUsername(username);
+        login(username);
+      }
+    }, 2000);
   }, []);
 
   return (

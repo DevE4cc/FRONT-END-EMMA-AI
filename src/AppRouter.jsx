@@ -13,6 +13,7 @@ export const AppRouter = () => {
     return (
         <Routes>
             <Route path='/' element={<Navigation />}>
+                <Route path='/:user' element={isSession ? <EmmaHome /> : <EmmaLogin />} />
                 <Route index element={isSession ? <EmmaHome /> : <EmmaLogin />} />
                 {/* <Route index element={<EmmaHome />} /> */}
                 <Route path='chat' element={<EmmaChat />} />
